@@ -11,6 +11,8 @@ import stock
 # reload(sys)
 # sys.setdefaultencoding('UTF8')
 
+FIELD_LEN = 20
+
 fieldNames = [
     'Papel',              #0
     'Cotação',            #1
@@ -106,26 +108,26 @@ class Business:
 
     @staticmethod
     def printData(businessStockData):
-        print(fieldNames[1] + ": R$ {:.2f}".format(businessStockData[fieldNames[1]]))
-        print(fieldNames[2] + ": {:.2f}".format(businessStockData[fieldNames[2]]))
-        print(fieldNames[3] + ": {:.2f}".format(businessStockData[fieldNames[3]]))
-        print(fieldNames[4] + ": {:.2f}".format(businessStockData[fieldNames[4]]))
-        print(fieldNames[5] + ": {:.2f}%".format(businessStockData[fieldNames[5]]))
-        print(fieldNames[6] + ": {:.2f}".format(businessStockData[fieldNames[6]]))
-        print(fieldNames[7] + ": {:.2f}".format(businessStockData[fieldNames[7]]))
-        print(fieldNames[8] + ": {:.2f}".format(businessStockData[fieldNames[8]]))
-        print(fieldNames[9] + ": {:.2f}".format(businessStockData[fieldNames[9]]))
-        print(fieldNames[10] + ": {:.2f}".format(businessStockData[fieldNames[10]]))
-        print(fieldNames[11] + ": {:.2f}".format(businessStockData[fieldNames[11]]))
-        print(fieldNames[12] + ": {:.2f}%".format(businessStockData[fieldNames[12]]))
-        print(fieldNames[13] + ": {:.2f}%".format(businessStockData[fieldNames[13]]))
-        print(fieldNames[14] + ": {:.2f}".format(businessStockData[fieldNames[14]]))
-        print(fieldNames[15] + ": {:.2f}%".format(businessStockData[fieldNames[15]]))
-        print(fieldNames[16] + ": {:.2f}%".format(businessStockData[fieldNames[16]]))
-        print(fieldNames[17] + ": {:.2f}".format(businessStockData[fieldNames[17]]))
-        print(fieldNames[18] + ": R$ {:.2f}".format(businessStockData[fieldNames[18]]))
-        print(fieldNames[19] + ": {:.2f}".format(businessStockData[fieldNames[19]]))
-        print(fieldNames[20] + ": {:.2f}%".format(businessStockData[fieldNames[20]]))
+        print(fieldNames[1].ljust(FIELD_LEN,'.') + ": R$ {:.2f}".format(businessStockData[fieldNames[1]]))
+        print(fieldNames[2].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[2]]))
+        print(fieldNames[3].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[3]]))
+        print(fieldNames[4].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[4]]))
+        print(fieldNames[5].ljust(FIELD_LEN,'.') + ": {:.2f}%".format(businessStockData[fieldNames[5]]))
+        print(fieldNames[6].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[6]]))
+        print(fieldNames[7].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[7]]))
+        print(fieldNames[8].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[8]]))
+        print(fieldNames[9].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[9]]))
+        print(fieldNames[10].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[10]]))
+        print(fieldNames[11].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[11]]))
+        print(fieldNames[12].ljust(FIELD_LEN,'.') + ": {:.2f}%".format(businessStockData[fieldNames[12]]))
+        print(fieldNames[13].ljust(FIELD_LEN,'.') + ": {:.2f}%".format(businessStockData[fieldNames[13]]))
+        print(fieldNames[14].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[14]]))
+        print(fieldNames[15].ljust(FIELD_LEN,'.') + ": {:.2f}%".format(businessStockData[fieldNames[15]]))
+        print(fieldNames[16].ljust(FIELD_LEN,'.') + ": {:.2f}%".format(businessStockData[fieldNames[16]]))
+        print(fieldNames[17].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[17]]))
+        print(fieldNames[18].ljust(FIELD_LEN,'.') + ": R$ {:.2f}".format(businessStockData[fieldNames[18]]))
+        print(fieldNames[19].ljust(FIELD_LEN,'.') + ": {:.2f}".format(businessStockData[fieldNames[19]]))
+        print(fieldNames[20].ljust(FIELD_LEN,'.') + ": {:.2f}%".format(businessStockData[fieldNames[20]]))
 
 class BusinessSector(Business):
     def __init__(self, code):
@@ -135,16 +137,42 @@ class BusinessSegment(Business):
     def __init__(self, code):
         super().__init__(code, stock.SEGMENT_LINK)
 
+class BusinessSectorThread (threading.Thread):
+   def __init__(self, code):
+        threading.Thread.__init__(self)
+        self.code = code
+        self.businessSector = None
+
+   def run(self):
+        self.businessSector = BusinessSector(self.code)
+
+class BusinessSegmentThread (threading.Thread):
+   def __init__(self, code):
+        threading.Thread.__init__(self)
+        self.code = code
+        self.businessSegment = None
+
+   def run(self):
+        self.businessSegment = BusinessSegment(self.code)
+
 class Stock:
     def __init__(self, name):
         self.name = name.upper()
         self.url = stock.STOCK_LINK + self.name
         self.page = requests.get(self.url)
         self.tree = html.fromstring(self.page.content)
+        bSectorCode = (self.tree.xpath(stock.STOCK_BUSINESS_SECTOR + '@href')[0]).split('=').pop()
+        bSegmntCode = (self.tree.xpath(stock.STOCK_BUSINESS_SEGMENT + '@href')[0]).split('=').pop()
+        bSectorThread = BusinessSectorThread(bSectorCode)
+        bSegmntThread = BusinessSegmentThread(bSegmntCode)
+        bSectorThread.start()
+        bSegmntThread.start()
+        bSectorThread.join()
+        bSegmntThread.join()
         self.sector = (self.tree.xpath(stock.STOCK_BUSINESS_SECTOR + 'text()')[0])
         self.segment = (self.tree.xpath(stock.STOCK_BUSINESS_SEGMENT + 'text()')[0])
-        self.businessSector = BusinessSector((self.tree.xpath(stock.STOCK_BUSINESS_SECTOR + '@href')[0]).split('=').pop())
-        self.businessSegment = BusinessSegment((self.tree.xpath(stock.STOCK_BUSINESS_SEGMENT + '@href')[0]).split('=').pop())
+        self.businessSector = bSectorThread.businessSector
+        self.businessSegment = bSegmntThread.businessSegment
         self.stockData = self.businessSegment.businessStockData[self.name]
 
     def compareTo(self, business):
@@ -153,7 +181,7 @@ class Stock:
                 val = "{:.2f}%".format((self.stockData[ref] - business[ref])*100.0/abs(business[ref]))
             except:
                 val = "N/A"
-            print(ref + ": " + val)
+            print(ref.ljust(FIELD_LEN,'.') + ": " + val)
 
     def getBusinessSector(self):
         return self.businessSector
@@ -165,8 +193,8 @@ def showStockInfo(stockCode):
     try:
         s = Stock(stockCode)
         print(">>> Dados de " + s.name + ": ")
-        print("Setor: " + s.sector)
-        print("Segmento: " + s.segment)
+        print("Setor...............: " + s.sector)
+        print("Segmento............: " + s.segment)
         Business.printData(s.stockData)
         print()
         # print(">>> Máximo do setor " + s.sector + ": ")
