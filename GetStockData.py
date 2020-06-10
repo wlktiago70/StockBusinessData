@@ -99,12 +99,13 @@ class Business:
         return self.maximum
 
     def printAverage(self):
-        self.printData(self.average)
+        Business.printData(self.average)
 
     def printMaximum(self):
-        self.printData(self.maximum)
+        Business.printData(self.maximum)
 
-    def printData(self, businessStockData):
+    @staticmethod
+    def printData(businessStockData):
         print(fieldNames[1] + ": R$ {:.2f}".format(businessStockData[fieldNames[1]]))
         print(fieldNames[2] + ": {:.2f}".format(businessStockData[fieldNames[2]]))
         print(fieldNames[3] + ": {:.2f}".format(businessStockData[fieldNames[3]]))
@@ -161,34 +162,41 @@ class Stock:
         return self.businessSegment
 
 def showStockInfo(stockCode):
-    s = Stock(stockCode)
-    print()
-    print(">>> Máximo do setor " + s.sector + ": ")
-    s.getBusinessSector().printMaximum()
-    print()
-    print(">>> Média do setor " + s.sector + ": ")
-    s.getBusinessSector().printAverage()
-    print()
-    print(">>> Máximo do segmento " + s.segment + ": ")
-    s.getBusinessSegment().printMaximum()
-    print()
-    print(">>> Média do segmento " + s.segment + ": ")
-    s.getBusinessSegment().printAverage()
-    print()
-    print(">>> " + s.name + " em comparação ao máximo do setor " + s.sector + ": ")
-    s.compareTo(s.getBusinessSector().getMaximum())
-    print()
-    print(">>> " + s.name + " em comparação à média do setor " + s.sector + ": ")
-    s.compareTo(s.getBusinessSector().getAverage())
-    print()
-    print(">>> " + s.name + " em comparação ao máximo do segmento " + s.segment + ": ")
-    s.compareTo(s.getBusinessSegment().getMaximum())
-    print()
-    print(">>> " + s.name + " em comparação à média do segmento " + s.segment + ": ")
-    s.compareTo(s.getBusinessSegment().getAverage())
-    print()
+    try:
+        s = Stock(stockCode)
+        print(">>> Dados de " + s.name + ": ")
+        print("Setor: " + s.sector)
+        print("Segmento: " + s.segment)
+        Business.printData(s.stockData)
+        print()
+        # print(">>> Máximo do setor " + s.sector + ": ")
+        # s.getBusinessSector().printMaximum()
+        # print()
+        # print(">>> Média do setor " + s.sector + ": ")
+        # s.getBusinessSector().printAverage()
+        # print()
+        # print(">>> Máximo do segmento " + s.segment + ": ")
+        # s.getBusinessSegment().printMaximum()
+        # print()
+        # print(">>> Média do segmento " + s.segment + ": ")
+        # s.getBusinessSegment().printAverage()
+        # print()
+        print(">>> " + s.name + " em comparação ao máximo do setor " + s.sector + ": ")
+        s.compareTo(s.getBusinessSector().getMaximum())
+        print()
+        print(">>> " + s.name + " em comparação à média do setor " + s.sector + ": ")
+        s.compareTo(s.getBusinessSector().getAverage())
+        print()
+        print(">>> " + s.name + " em comparação ao máximo do segmento " + s.segment + ": ")
+        s.compareTo(s.getBusinessSegment().getMaximum())
+        print()
+        print(">>> " + s.name + " em comparação à média do segmento " + s.segment + ": ")
+        s.compareTo(s.getBusinessSegment().getAverage())
+        print()
+    except:
+        print("Masoquê??!!")
 
 while True:
-    stockCode = input("Código do papel: ")
+    stockCode = input(">>> Código do papel: ")
     showStockInfo(stockCode)
     print()
