@@ -12,6 +12,7 @@ import stock
 # sys.setdefaultencoding('UTF8')
 
 FIELD_LEN = 20
+VALUE_LEN = 8
 
 fieldNames = [
     'Papel',              #0
@@ -181,7 +182,7 @@ class Stock:
                 val = "{:.2f}%".format((self.stockData[ref] - business[ref])*100.0/abs(business[ref]))
             except:
                 val = "N/A"
-            print(ref.ljust(FIELD_LEN,'.') + ": " + val)
+            print(ref.ljust(FIELD_LEN,'.') + ": " + val.rjust(VALUE_LEN,' '))
 
     def getBusinessSector(self):
         return self.businessSector
