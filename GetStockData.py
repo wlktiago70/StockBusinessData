@@ -107,6 +107,12 @@ class Business:
     def printMaximum(self):
         Business.printData(self.maximum)
 
+    def printStocks(self):
+        result = ""
+        for s in self.businessStockData.keys():
+            result += (" | " + s)
+        print(result + " |")
+
     @staticmethod
     def printData(businessStockData):
         print(fieldNames[1].ljust(FIELD_LEN,'.') + ": R$ {:.2f}".format(businessStockData[fieldNames[1]]))
@@ -210,11 +216,17 @@ def showStockInfo(stockCode):
         # print(">>> Média do segmento " + s.segment + ": ")
         # s.getBusinessSegment().printAverage()
         # print()
+        print(">>> Setor " + s.sector + ": ")
+        s.getBusinessSector().printStocks()
+        print()
         print(">>> " + s.name + " em comparação ao máximo do setor " + s.sector + ": ")
         s.compareTo(s.getBusinessSector().getMaximum())
         print()
         print(">>> " + s.name + " em comparação à média do setor " + s.sector + ": ")
         s.compareTo(s.getBusinessSector().getAverage())
+        print()
+        print(">>> Segmento " + s.segment + ": ")
+        s.getBusinessSegment().printStocks()
         print()
         print(">>> " + s.name + " em comparação ao máximo do segmento " + s.segment + ": ")
         s.compareTo(s.getBusinessSegment().getMaximum())
